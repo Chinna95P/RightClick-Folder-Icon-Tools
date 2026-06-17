@@ -1,6 +1,6 @@
 
 
-
+	<rating name="imdb" max="10" default="true">
 	<value>8.8</value>
 	<Genre>Testing</Genre>
 	<Genre>Generate</Genre>

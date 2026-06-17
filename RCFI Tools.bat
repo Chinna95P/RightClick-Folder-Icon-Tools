@@ -1,11 +1,35 @@
 @echo off
-:: Update v0.6
-:: 2025-01-04 Fixed: a slight typo in RCFI.templates.ini causing a variable to disable using logo as a folder name not working.
-:: 2025-01-09 Added: New configuration to disable the file selection dialog. (requested in #19)
+:: Update v0.5
+:: 2024-11-28 Resolved: Folder icon changes now update instantly. No longer need to wait 30–40 seconds. (Issue #15)
+:: 2024-12-02 Added: 'Choose from Collections' to the folder right-click menu.
+:: 2024-12-03 Added: 'Add to Collections' to the image right-click menu.
+:: 2024-12-03 Removed: 'Choose and Set as Folder Icon' from the image right-click menu.
+:: 2024-12-03 Removed: 'Refresh Icon Cache (Without Restart)' from the folder right-click menu.
+:: 2024-12-03 Fixed: Folder icons being replaced without user confirmation.
+:: 2024-12-03 Added: File selector to choose image files using a GUI interface.
+:: 2024-12-03 Added: Shortcut to select images from the 'Collections' folder using the file selection dialog.
+:: 2024-12-04 Added: Config option to specify the "Collections" folder and the initial directory for the file selection dialog.
+:: 2024-12-04 Added: Config option to specify the template to use for images from the "Collections" folder (including its subfolders).
+:: 2024-12-04 Improved: Logic to skip the "TemplateAlwaysAsk" dialog when conditions for "TemplateFor" are met.
+:: 2024-12-05 Improved: Removed unused lines, reorganized code, and optimized performance (possibly creating some bugs too 😅).
+:: 2024-12-05 Improved: Right-click 'Change Folder Icon' now opens the file selection dialog.
+:: 2024-12-06 Modified: Changed the default settings to TemplateIconSize="Auto", HideAsSystemFiles="Yes"
+:: 2024-12-07 Fixed: Convert.exe failing to generate icons when using the 'generate' feature.
+:: 2024-12-09 Fixed: Unable to open 'Global Template Configuration' from the Template Configurations menu.
+:: 2024-12-10 Fixed: Some folder names not displaying correctly during icon generation.
+:: 2024-12-18 Added: New template — "DualTab Vertical" (Requested in #17).
+:: 2024-12-24 Added: Option to customize the folder name on some templates.
+:: 2024-12-24 Rolled back: SingleInstanceAccumulator from v1.0.0.5 to v0.0.0.0, so users don't need to download and install Microsoft .NET 8.0.  
+:: 2024-12-25 Improved: Optimized file selector logic.  
+:: 2024-12-27 Added: Auto-refresh folder after task completion.
+:: 2024-12-27 Fixed: "TemplateAlwaysAsk" activated every time a template was selected in 'Template Configurations'.
+:: 2024-12-27 Added: Option to toggle "TemplateAlwaysAsk" in 'Template Configurations'.
+:: 2024-12-28 Updated: Recompiled FolderIconUpdater.exe to include required libraries.
+:: 2025-01-01 Happy New Year! 🎉 
 
 setlocal
 set name=RCFI Tools
-set version=v0.6
+set version=v0.5
 chcp 65001 >nul
 PUSHD    "%~dp0"
 title %name%   "%cd%"
@@ -109,6 +133,7 @@ if /i "%act%"=="RefreshNR"	goto FI-Refresh-NoRestart
 if /i "%act%"=="FI-Template-Sample-All" goto FI-Template-Sample-All
 if /i "%Context%"=="Refresh.Here"	PUSHD    "%SelectedThing%" &set "cdonly=false"	&set "RefreshOpen=Index"		&goto FI-Refresh
 if /i "%Context%"=="RefreshNR.Here"	PUSHD    "%SelectedThing%" &set "cdonly=false"	&set "RefreshOpen=Index"		&goto FI-Refresh-NoRestart
+
 
 :Setup                            
 if /i "%setup%" EQU "Deactivate" set "setup_select=2" &goto Setup-Choice
@@ -256,10 +281,12 @@ if /i "%Command%"=="Move"			set "recursive=no"	&set "rename=Ask"		&goto FI-Move
 if /i "%Command%"=="Mov"			set "recursive=no"	&set "Move=Ask"		&goto FI-Move
 if /i "%Command%"=="Moves"		set "recursive=yes"	&set "Move=Ask"		&goto FI-Move
 if /i "%Command%"=="Movs"		set "recursive=yes"	&set "Move=Ask"		&goto FI-Move
+
 if /i "%Command%"=="Hide"		set "recursive=no"	&goto FI-Hide
 if /i "%Command%"=="Hid"			set "recursive=no"	&goto FI-Hide
 if /i "%Command%"=="Hides"		set "recursive=yes"	&goto FI-Hide
 if /i "%Command%"=="Hids"		set "recursive=yes"	&goto FI-Hide
+
 if /i "%Command%"=="on"			set "refreshopen=index"	&goto FI-Activate
 if /i "%Command%"=="off"			set "refreshopen=index"	&goto FI-Deactivate
 if /i "%Command%"=="copy"			goto CopyFolderIcon
@@ -296,6 +323,7 @@ if /i "%Command%"=="cfg"			goto config
 if /i "%Command%"=="cmd"			cls&cmd.exe
 if exist "%Command%" set "input=%command:"=%"&goto directInput
 goto Input-Error
+
 
 :Input-Context                    
 title %name% %version% ^| "%cd%"
@@ -358,6 +386,7 @@ if /i "%Context%"=="More.Context"				goto FI-More_Tools
 REM Other
 if /i "%Context%"=="FI.Deactivate" 			set "Setup=Deactivate" &goto Setup
 goto Input-Error
+
 
 :Input-Error                      
 echo %TAB%%TAB%%R_% Invalid input.  %_%
@@ -461,12 +490,6 @@ call :FI-Generate-Folder_Icon
 goto options
 
 :FI-File_Selector
-set "FS-Disable=No"
-set /a FS_Call+=1
-if %FS_Call% EQU 1 (
-	if /i "%FileSelector%"=="no" set "FS-Disable=yes"
-) else set "FS-Disable=no"
-
 set "FS-BackToBackup="
 set "FileSelectorPathBackup=%FileSelectorPath%"
 if not exist "%FileSelectorPath%" set "FileSelectorPath=D:\"
@@ -493,12 +516,12 @@ set "SaveSelectedFile=%RCFI%\resources\selected_file.txt"
 set "fileFilter=Image Files (*.jpg, *.png, *.ico, ...)|%ImageFilter%"
 set "OpenFileSelector=Add-Type -AssemblyName System.Windows.Forms; $f = New-Object System.Windows.Forms.OpenFileDialog; $f.InitialDirectory = '%initialDirectory%'; $fileDialog.RestoreDirectory = $true; $f.Multiselect = $true; $f.Filter = '%fileFilter%'; $f.ShowDialog() | Out-Null; $f.FileName; exit"
 
-if /i not "%FS-referer%"=="cmd" if /i not "%FS-Disable%"=="yes" (
+if /i not "%FS-referer%"=="cmd" (
 echo.&echo.&echo.&echo.&echo.&echo.&echo.&echo.&echo.&echo.
 echo                     %I_%%G_%     Select a file from the file selection dialog     %_%
 )
 
-if /i not "%FS-Disable%"=="yes" start /MIN /WAIT "Select file" "%RCFI%\resources\File_Selector.bat"
+start /MIN /WAIT "Select file" "%RCFI%\resources\File_Selector.bat"
 
 if exist "%SaveSelectedFile%" (
     for /f "usebackq tokens=* delims=" %%F in ("%SaveSelectedFile%") do (
@@ -3655,7 +3678,6 @@ if defined OldKeywords set "SavedKeywords=%OldKeywords%"
 	echo HideAsSystemFiles="%HideAsSystemFiles%"
 	echo DeleteOriginalFile="%DeleteOriginalFile%"
 	echo TextEditor="%TextEditor%"
-	echo FileSelector="%FileSelector%"
 	echo CollectionsFolder="%CollectionsFolder%"
 	echo FileSelector-defaultPath="%FileSelector-DefaultPath%"
 	echo ----------------------------------
@@ -3745,9 +3767,6 @@ if not defined FileSelector-DefaultPath set "FileSelector-DefaultPath=%RCFI%\not
 if not defined FileSelectorPath set "FileSelectorPath=%RCFI%\not exist."
 if not defined CollectionsFolder set "CollectionsFolder=%RCFI%\not exist."
 
-REM update config from v0.5 to v0.6
-if not defined FileSelector set "FileSelector=Yes"
-
 if exist "%Template:"=%" (for %%T in ("%Template:"=%") do set Template="%%~nT")
 if exist "%TemplateForICO:"=%"	(for %%T in ("%TemplateForICO:"=%") do set TemplateForICO="%%~nT")
 if exist "%TemplateForPNG:"=%"	(for %%T in ("%TemplateForPNG:"=%") do set TemplateForPNG="%%~nT")
@@ -3769,7 +3788,6 @@ set "IconFileName=%IconFileName:"=%"
 set "HideAsSystemFiles=%HideAsSystemFiles:"=%"
 set "DeleteOriginalFile=%DeleteOriginalFile:"=%"
 set "TextEditor=%TextEditor:"=%"
-set "FileSelector=%FileSelector:"=%"
 set "CollectionsFolder=%CollectionsFolder:"=%"
 set "FileSelector-DefaultPath=%FileSelector-DefaultPath:"=%"
 set "FileSelectorPath=%FileSelectorPath:"=%"
@@ -3834,7 +3852,6 @@ PUSHD "%~dp0"
     echo HideAsSystemFiles="Yes"
     echo DeleteOriginalFile="No"
     echo TextEditor="%windir%\notepad.exe"
-    echo FileSelector="Yes"
     echo CollectionsFolder="%RCFI%\collections"
     echo FileSelector-DefaultPath="Specify a drive path or use the last opened file selector path."
     echo DrivePath="%cd%"
@@ -3859,7 +3876,7 @@ PUSHD "%~dp0"
     echo.
     echo set "custom-FolderName="
     echo.
-    echo set "use-Logo-instead-FolderName="
+    echo set "use-Logo-instead-of-FolderName="
     echo set "display-clearArt="
     echo set "display-movieinfo="
     echo set "show-Rating="

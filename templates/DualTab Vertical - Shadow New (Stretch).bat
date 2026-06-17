@@ -1,4 +1,6 @@
-:: Template-Version=v1.0
+:: Template-Version=v1.2
+:: 2025-12-24 Added auto adjusted font size and font spacing for the second tab.
+:: 2026-01-11 Added Shadow on tab labels.
 
 ::                Template Info
 ::========================================================
@@ -9,15 +11,27 @@
 
 ::                Template Config
 ::========================================================
-set "use-GlobalConfig=yes"
+set "use-GlobalConfig=no"
 set "custom-FolderName=yes"
  
 ::--------- Label --------------------------
 set "display-FolderName=yes"
-set "FolderNameShort-characters-limit=10"
-set "FolderNameLong-characters-limit=38"
 set "FolderName-Center=Auto"
-set "FolderName-Font-Color=rgba(255,255,255,0.9)"
+
+set "FolderNameShort-characters-limit=10"
+set "FolderNameShort-Font-Color=rgba(255,255,255,0.9)"
+set "FolderNameShort-Shadow=20x1"
+set "FolderNameShort-Center=-gravity center -geometry +200-67"
+set "FolderNameShort-Left=-gravity Northwest -geometry +425+110"
+
+set "FolderNameLong-characters-limit=38"
+set "FolderNameLong-Font-Color=rgba(250,250,250,0.8)"
+set "FolderNameLong-Shadow=0x2"
+set "FolderNameLong-Pos=-gravity Northwest -geometry +405+18"
+
+set "Tab2-Pos=-gravity center -geometry +203+92"
+set "Tab2-Shadow=35x0.9"
+set "Tab2-Font-Color=rgba(250,250,250,0.9)"
 
 ::--------- Movie Info ---------------------
 set "display-movieinfo=yes"
@@ -102,6 +116,11 @@ if /i "%custom-FolderName%"=="yes" (
 	if exist "%cfn1%" (
 		for /f "usebackq tokens=* delims=" %%C in ("%cfn1%") do %%C
 		del /q "%cfn1%"
+	)
+	if defined FolderName-Font-Color (
+		call set "FolderNameShort-Font-Color=%%FolderName-Font-Color%%"
+		call set "FolderNameLong-Font-Color=%%FolderName-Font-Color%%"
+		call set "Tab2-Font-Color=%%FolderName-Font-Color%%"
 	)
 	if exist "%cfn2%" (
 		for /f "usebackq tokens=* delims=" %%C in ("%cfn2%") do set tab2-label=%%C
@@ -206,7 +225,7 @@ echo %TAB% %G_%Logo        :%ESC%%LogoName%%ESC%
 
 set LAYER-LOGO-IMAGE= ( "%Logo%" ^
 	 -trim +repage ^
-	 -scale 167x60^ ^
+	 -scale 160x60^ ^
 	 -background none ^
 	 -gravity center ^
 	 -geometry +200-72 ^
@@ -260,8 +279,8 @@ set /A "FolNamShortLimiter=%FolNamShortLimit%-4"
 if %FolNamShortCount% GTR %FolNamShortLimit% call set "FolNamShort=%%FolderName:~0,%FolNamShortLimiter%%%..."
     
       
-set "FolNamPos-Center=-gravity center -geometry +205-69"
-set "FolNamPos-Left=-gravity Northwest -geometry +422+92"
+set "FolNamPos-Center=%FolderNameShort-Center%"
+set "FolNamPos-Left=%FolderNameShort-Left%"
 if %FolNamShortCount% LEQ %FolNamShortLimiter% (set "FolNamPos=%FolNamPos-Left%") else (set "FolNamPos=%FolNamPos-Center%")
 if /i "%FolderName-Center%"=="yes" set "FolNamPos=%FolNamPos-Center%"
 if /i "%FolderName-Center%"=="no"  set "FolNamPos=%FolNamPos-Left%"
@@ -279,35 +298,34 @@ if %FolNamLongCount% GTR %FolNamLongLimit% call set "FolNamLong=%%FolderName:~0,
 set LAYER-FOLDER-NAME-SHORT= ^
 	 ( ^
 	 -font "%RCFI%\resources\BIG_NOODLE_TITLING.ttf" ^
-	 -fill %FolderName-Font-Color% ^
+	 -fill %FolderNameShort-Font-Color% ^
 	 -density 400 ^
 	 -pointsize 7 ^
 	 -kerning 1.2 ^
 	 %FolNamPos% ^
 	 -background none ^
 	 label:"%FolNamShort%" ^
-	 ( +clone -background BLACK -shadow 00x2+0.6+0.6 ) +swap -background none -layers merge ^
-	 ( +clone -background BLACK -shadow 00x2-0.6-0.6 ) +swap -background none -layers merge ^
-	 ( +clone -background BLACK -shadow 00x2-0.6+0.6 ) +swap -background none -layers merge ^
-	 ( +clone -background BLACK -shadow 00x2+0.6-0.6 ) +swap -background none -layers merge ^
+	 ( +clone -background BLACK -shadow %FolderNameShort-Shadow%+0.6+0.6 ) +swap -background none -layers merge ^
+	 ( +clone -background BLACK -shadow %FolderNameShort-Shadow%+0.6+0.6 ) +swap -background none -layers merge ^
+	 ( +clone -background BLACK -shadow %FolderNameShort-Shadow%+0.6+0.6 ) +swap -background none -layers merge ^
+	 ( +clone -background BLACK -shadow %FolderNameShort-Shadow%+0.6+0.6 ) +swap -background none -layers merge ^
 	 -rotate 90 ) -composite
    
 if %FolNamShortCount% LEQ %FolNamShortLimit% exit /b
 set LAYER-FOLDER-NAME-LONG= ^
 	 ( ^
 	 -font "%RCFI%\resources\BIG_NOODLE_TITLING.ttf"  ^
-	 -fill %FolderName-Font-Color% ^
+	 -fill %FolderNameLong-Font-Color% ^
 	 -density 400 ^
 	 -pointsize 2.8 ^
 	 -kerning 2 ^
-	 -gravity Northwest ^
-	 -geometry +382-3 ^
+	  %FolderNameLong-Pos% ^
 	 -background none ^
 	 label:"%FolNamLong%" ^
-	 ( +clone -background BLACK -shadow 0x5+0.2+0.2 ) +swap -background none -layers merge ^
-	 ( +clone -background BLACK -shadow 0x5-0.2-0.2 ) +swap -background none -layers merge ^
-	 ( +clone -background BLACK -shadow 0x5-0.2+0.2 ) +swap -background none -layers merge ^
-	 ( +clone -background BLACK -shadow 0x5+0.2-0.2 ) +swap -background none -layers merge ^
+	 ( +clone -background BLACK -shadow %FolderNameLong-Shadow%+0.2+0.2 ) +swap -background none -layers merge ^
+	 ( +clone -background BLACK -shadow %FolderNameLong-Shadow%+0.2+0.2 ) +swap -background none -layers merge ^
+	 ( +clone -background BLACK -shadow %FolderNameLong-Shadow%+0.2+0.2 ) +swap -background none -layers merge ^
+	 ( +clone -background BLACK -shadow %FolderNameLong-Shadow%+0.2+0.2 ) +swap -background none -layers merge ^
 	 -rotate 90 ) -composite
 
 if "%FolderNameLong-characters-limit%"=="0" set "LAYER-FOLDER-NAME-LONG="
@@ -322,6 +340,7 @@ set LAYER-TAB2= ( ^
 	 -scale 512x512! ^
 	 -modulate 100,130 ^
 	 -brightness-contrast 8x13 ^
+	 -brightness-contrast -2x0 ^
 	 -blur 0x50 ^
 	 "%DualTabV-tab2%" ) -compose over -composite
 	 
@@ -351,22 +370,74 @@ if defined Logo2 set LAYER-TAB2-LOGO= ^
 
 if defined LAYER-TAB2-LOGO exit /b
 
+:: Adjusting font size and characters spacing base on characters count
+
+if defined tab2-label set "ChCount=%tab2-label%"&call :ChCount
+
+:: Default Tab2 Font Size
+set "Tab2_Font-Size=5"
+set "Tab2_Font-Spacing=2"
+
+:: Tab2 FontSize if characters count less than 8
+if %ChCount% LSS 8 (
+	set "Tab2_Font-Size=7"
+	set "Tab2_Font-Spacing=3"
+)
+
+:: Tab2 FontSize if characters count greater than 11
+if %ChCount% GTR 11 call :Tab2-Label-Reducer
+
 set LAYER-TAB2-LABEL= ^
    ( ^
 	 -font "%RCFI%\resources\BIG_NOODLE_TITLING.ttf" ^
-	 -fill %FolderName-Font-Color% ^
+	 -fill %Tab2-Font-Color% ^
 	 -density 400 ^
-	 -pointsize 5 ^
-	 -kerning 3 ^
-	 -gravity center ^
-	 -geometry +207+88 ^
+	 -pointsize %Tab2_Font-Size% ^
+	 -kerning %Tab2_Font-Spacing% ^
+	 %Tab2-Pos% ^
 	 -background none ^
 	 label:"%tab2-label%" ^
-	 ( +clone -background BLACK -shadow 00x7.0+0.1-0.1 ) +swap -background none -layers merge ^
-	 ( +clone -background BLACK -shadow 00x7.0-0.1-0.1 ) +swap -background none -layers merge ^
-	 ( +clone -background BLACK -shadow 00x7.0-0.1+0.1 ) +swap -background none -layers merge ^
-	 ( +clone -background BLACK -shadow 00x7.0+0.1-0.1 ) +swap -background none -layers merge ^
+	 ( +clone -background BLACK -shadow %Tab2-Shadow%+1+1 ) +swap -background none -layers merge ^
+	 ( +clone -background BLACK -shadow %Tab2-Shadow%+1+1 ) +swap -background none -layers merge ^
+	 ( +clone -background BLACK -shadow %Tab2-Shadow%+1+1 ) +swap -background none -layers merge ^
+	 ( +clone -background BLACK -shadow %Tab2-Shadow%+1+1 ) +swap -background none -layers merge ^
 	 -rotate 90 ) -composite
 exit /b
 
+:Tab2-Label-Reducer
+set /a len=%ChCount%
+set /a refLen=9
+set /a baseFont=45
+set /a baseKerning=40
+
+:: step count
+set /a stepFont=(50-45)/(15-11)
+set /a stepKerning=(30-10)/(15-11)
+
+:: dynamic count
+set /a Tab2fontsize=baseFont - (len - refLen) * stepFont
+set /a Tab2kerning=baseKerning - (len - refLen) * stepKerning
+
+if %Tab2fontsize% GEQ 10 set Tab2fontsize=%Tab2fontsize:~0,-1%.%Tab2fontsize:~-1%
+if %Tab2kerning% GEQ 10 set Tab2kerning=%Tab2kerning:~0,-1%.%Tab2kerning:~-1%
+if %ChCount% GTR 15 set Tab2kerning=0
+
+set Tab2_Font-Size=%Tab2fontsize%
+set Tab2_Font-Spacing=%Tab2kerning%
+
+echo %TAB% %G_%2ndTab_Characters: %ChCount%   Font size: %Tab2_Font-Size%   Spacing: %Tab2_Font-Spacing%
+exit /b
+
+:ChCount
+set /a ChCounting+=1
+if not defined ChCount if ChCounting EQU 1 (
+	set ChCount=0
+	exit /b
+	) else (
+	set /a ChCount=%ChCounting%-1
+	set ChCounting=0
+	exit /b
+	)
+set "ChCount=%ChCount:~1%"
+goto ChCount
 :::::::::::::::::::::::::::   CODE END   ::::::::::::::::::::::::::::::::::
