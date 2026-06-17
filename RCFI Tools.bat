@@ -1,4 +1,9 @@
 @echo off
+:: Update v0.6
+:: 2026-06-17 Added: Shadow settings for the font for the dualtab templates.
+:: 2026-06-17 Added: New templates with dualtabs for posters with vertical and horizontal modes.
+:: 2026-06-17 Modified: Dualtab templates for crop/stretch poster images separated into distinct templates.
+::::::::::::::::::::::::::::::::::::::
 :: Update v0.5
 :: 2024-11-28 Resolved: Folder icon changes now update instantly. No longer need to wait 30–40 seconds. (Issue #15)
 :: 2024-12-02 Added: 'Choose from Collections' to the folder right-click menu.
