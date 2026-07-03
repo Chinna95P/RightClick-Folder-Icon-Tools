@@ -6,7 +6,7 @@
 CONFIG_DIR="$HOME/.config/rcfi-tools"
 CONFIG_FILE="$CONFIG_DIR/config.ini"
 APP_DIR="$HOME/.local/share/rcfi-tools"
-TEMPLATES_DIR="$APP_DIR/templates/linux"
+TEMPLATES_DIR="$APP_DIR/templates"
 RESOURCES_DIR="$APP_DIR/resources"
 COLLECTIONS_DIR="$APP_DIR/collections"
 
@@ -182,6 +182,61 @@ case "$ACTION" in
             kdialog --passivepopup "Icon generated: $output" 3
         else
             kdialog --error "Template not found."
+        fi
+        ;;
+    --search-fi|--search-poster|--search-icon)
+        query=$(basename "$TARGET")
+        suffix="folder icon"
+        [[ "$ACTION" == "--search-poster" ]] && suffix="poster"
+        [[ "$ACTION" == "--search-icon" ]] && suffix="icon"
+        xdg-open "https://google.com/search?q=${query}+${suffix}&tbm=isch&tbs=ic:trans"
+        ;;
+    --collections)
+        # Open collections folder in file manager so user can pick an image
+        # Wait, if called from context menu, usually it opens a dialog to pick from collections
+        img=$(kdialog --getopenfilename "$COLLECTIONS_DIR" "image/*")
+        if [ -n "$img" ]; then
+            # Generate icon using the selected image
+            export inputfile="$img"
+            export outputfile="$TARGET/.foldericon.png"
+            export IM_CMD
+            export APP_DIR
+            template=$(get_config "Template")
+            if [ -f "$TEMPLATES_DIR/$template" ]; then
+                bash "$TEMPLATES_DIR/$template"
+                set_folder_icon "$TARGET" "./.foldericon.png"
+                kdialog --passivepopup "Folder icon changed using collection image!" 3
+            fi
+        fi
+        ;;
+    --img-add-col)
+        mkdir -p "$COLLECTIONS_DIR"
+        cp "$TARGET" "$COLLECTIONS_DIR/"
+        kdialog --passivepopup "Added to collections!" 3
+        ;;
+    --set-as-icon)
+        # Assuming TARGET is the image file. We need to ask for the folder.
+        folder=$(kdialog --getexistingdirectory "$HOME")
+        if [ -n "$folder" ]; then
+            export inputfile="$TARGET"
+            export outputfile="$folder/.foldericon.png"
+            export IM_CMD
+            export APP_DIR
+            template=$(get_config "Template")
+            if [ -f "$TEMPLATES_DIR/$template" ]; then
+                bash "$TEMPLATES_DIR/$template"
+                set_folder_icon "$folder" "./.foldericon.png"
+                kdialog --passivepopup "Set as folder icon for $(basename "$folder")!" 3
+            fi
+        fi
+        ;;
+    --img-convert)
+        # Basic convert wrapper
+        new_ext=$(kdialog --combobox "Select output format:" "png" "jpg" "webp" "bmp")
+        if [ -n "$new_ext" ]; then
+            out="${TARGET%.*}.$new_ext"
+            "$IM_CMD" "$TARGET" "$out"
+            kdialog --passivepopup "Converted to $new_ext" 3
         fi
         ;;
     *)

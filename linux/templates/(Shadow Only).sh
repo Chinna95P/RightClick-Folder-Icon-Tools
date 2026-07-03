@@ -1,18 +1,29 @@
 #!/bin/bash
+#      Template Info
+#===================================
+#` Output image will be the same as source image, without frame or anything
+#` but with added shadow and image posisition will be in the center.
+#` Convert and edit using ImageMagick.
+#` -------------------------------------------------------------------
 
-# Template: (Shadow Only)
-# Output image will be the same as source image, without frame or anything
-# but with added shadow and image position will be in the center.
-
+#      Template Config
+#===================================
 image_position="CENTER"
+
+# |----------------------------------|
+# |          image-position          |
+# | Northwest   North    Northeast   |
+# | West        Center   East        |
+# | SouthWest   South    SouthEast   |
+# |----------------------------------|
+
 shadow_color="BLACK"
 shadow_opacity="60"
 shadow_blur="5"
-shadow_x_position="+5"
-shadow_y_position="+6.5"
+shadow_X_position="+5"
+shadow_Y_position="+6.5"
 
-"$IM_CMD" "$inputfile" -resize 490x490 \
-    \( +clone -background "$shadow_color" -shadow "${shadow_opacity}x${shadow_blur}${shadow_x_position}${shadow_y_position}" \) \
-    +swap -background none -layers merge \
-    -gravity "$image_position" -extent 512x512 \
-    -define icon:auto-resize="$TemplateIconSize" "$outputfile"
+
+#      Template Command
+#===================================
+"$IM_CMD" "$inputfile" -resize 490x490 \( +clone -background "$shadow_color" -shadow "${shadow_opacity}x${shadow_blur}${shadow_X_position}${shadow_Y_position}" \) +swap -background none -layers merge -gravity "$image_position" -extent 512x512 -define icon:auto-resize="$TemplateIconSize" "$OutputFile"

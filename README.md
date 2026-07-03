@@ -36,15 +36,30 @@ Adds "Folder Icon Tools" to your right-click menus, allowing you to easily custo
 <br><br>
 
 # Installation
+
+### Windows
 1. Download the .zip file [**here**](https://github.com/ramdany7/RightClickFolderIconTools/releases).
-2. Extract  it using the password: **1234**.
+2. Extract it using the password: **1234**.
 3. Put the "RCFI Tools" folder somewhere, once it's installed, you are not allowed to move the folder; otherwise you'll have to reinstall it.
-4. Open RCFI Tools.bat.
+4. Open `RCFI Tools.bat`.
 5. You'll be prompted to allow the script to write to the Registry. Click 'Yes' to proceed with the installation.
 6. There will be 'config.ini' and 'uninstall.cmd' generated. Done.
 
 You can access '**Folder Icon Tools**' via the right-click menu in Windows Explorer.
 > **Note**: In case if "**RCFI Tools.bat**" is flagged as a malicious program by antivirus software (see the issue [discussion](https://github.com/ramdany7/RightClickFolderIconTools/issues/1)), you might have to add the "**RCFI Tools.bat**" to the allow list in your antivirus.
+
+### Linux (KDE Plasma & Bazzite)
+A native Linux port is included, specifically designed for KDE Plasma (Dolphin file manager). It works across standard Linux distributions as well as immutable distros like Bazzite.
+
+1. Clone or download this repository.
+2. Open a terminal in the root directory.
+3. Run the installer:
+   ```bash
+   bash linux/install.sh
+   ```
+4. The installer will check for `ImageMagick` and `kdialog`. If they are missing, it will prompt you to install them.
+5. The tools will be added to Dolphin's context menu via KDE ServiceMenus.
+6. (Optional) You may need to restart Dolphin (`killall dolphin`) for the context menus to appear.
 
 <br><br>
 
