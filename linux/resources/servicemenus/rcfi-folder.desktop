@@ -1,0 +1,72 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=inode/directory;
+Actions=ChangeIcon;Collections;ChooseTemplate;Scan;DefKey;GenKey;GenJPG;GenPNG;SearchFI;SearchPoster;SearchIcon;RemoveIcon;ActivateDeactivate;
+X-KDE-Submenu=Folder Icon Tools
+X-KDE-Submenu-Icon=folder-image
+
+[Desktop Action ChangeIcon]
+Name=Change folder icon
+Icon=folder-image
+Exec=rcfi-tools.sh --change-icon "%f"
+
+[Desktop Action Collections]
+Name=Choose from Collections
+Icon=folder-favorites
+Exec=rcfi-tools.sh --collections "%f"
+
+[Desktop Action ChooseTemplate]
+Name=Choose template
+Icon=view-choose
+Exec=rcfi-tools.sh --choose-template "%f"
+
+[Desktop Action Scan]
+Name=Scan
+Icon=system-search
+Exec=rcfi-tools.sh --scan "%f"
+
+[Desktop Action DefKey]
+Name=Define keywords
+Icon=dialog-information
+Exec=rcfi-tools.sh --def-key "%f"
+
+[Desktop Action GenKey]
+Name=Generate from keywords
+Icon=run-build
+Exec=rcfi-tools.sh --gen-key "%f"
+
+[Desktop Action GenJPG]
+Name=Generate from *.JPG
+Icon=image-jpeg
+Exec=rcfi-tools.sh --gen-ext jpg "%f"
+
+[Desktop Action GenPNG]
+Name=Generate from *.PNG
+Icon=image-png
+Exec=rcfi-tools.sh --gen-ext png "%f"
+
+[Desktop Action SearchFI]
+Name=Search folder icon
+Icon=edit-find
+Exec=rcfi-tools.sh --search-fi "%f"
+
+[Desktop Action SearchPoster]
+Name=Search poster
+Icon=edit-find
+Exec=rcfi-tools.sh --search-poster "%f"
+
+[Desktop Action SearchIcon]
+Name=Search icon
+Icon=edit-find
+Exec=rcfi-tools.sh --search-icon "%f"
+
+[Desktop Action RemoveIcon]
+Name=Remove folder icon
+Icon=edit-delete
+Exec=rcfi-tools.sh --remove "%f"
+
+[Desktop Action ActivateDeactivate]
+Name=Activate/Deactivate folder icon
+Icon=view-refresh
+Exec=rcfi-tools.sh --toggle-active "%f"

@@ -1,0 +1,57 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=image/jpeg;image/png;image/webp;image/svg+xml;image/bmp;image/x-tga;
+Actions=SetAsFolderIcon;AddToCollections;GenerateIcon;GeneratePNG;TemplateSamples;ChooseTemplate;EditTemplate;ConvertImage;CompressImage;ResizeImage;
+X-KDE-Submenu=Folder Icon Tools
+X-KDE-Submenu-Icon=folder-image
+
+[Desktop Action SetAsFolderIcon]
+Name=Set as folder icon
+Icon=folder-image
+Exec=rcfi-tools.sh --set-as-icon "%f"
+
+[Desktop Action AddToCollections]
+Name=Add to Collections
+Icon=folder-favorites
+Exec=rcfi-tools.sh --img-add-col "%f"
+
+[Desktop Action GenerateIcon]
+Name=Generate Icon
+Icon=run-build
+Exec=rcfi-tools.sh --img-gen-icon "%f"
+
+[Desktop Action GeneratePNG]
+Name=Generate PNG
+Icon=run-build
+Exec=rcfi-tools.sh --img-gen-png "%f"
+
+[Desktop Action TemplateSamples]
+Name=Generate template samples
+Icon=view-preview
+Exec=rcfi-tools.sh --img-sample "%f"
+
+[Desktop Action ChooseTemplate]
+Name=Choose template
+Icon=view-choose
+Exec=rcfi-tools.sh --choose-template "%f"
+
+[Desktop Action EditTemplate]
+Name=Edit current template
+Icon=document-edit
+Exec=rcfi-tools.sh --edit-template "%f"
+
+[Desktop Action ConvertImage]
+Name=Convert images
+Icon=transform-scale
+Exec=rcfi-tools.sh --img-convert "%f"
+
+[Desktop Action CompressImage]
+Name=Compress images
+Icon=archive-insert
+Exec=rcfi-tools.sh --img-compress "%f"
+
+[Desktop Action ResizeImage]
+Name=Resize images
+Icon=transform-scale
+Exec=rcfi-tools.sh --img-resize "%f"
